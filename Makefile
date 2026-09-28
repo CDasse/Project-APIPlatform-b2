@@ -21,7 +21,7 @@ help: ## Outputs this help screen
 build: ## Builds the Docker images
 	@$(DOCKER_COMP) build --pull
 
-up: ## Start the docker hub in detached mode (no logs)
+up: ## Start the docker hub and wait until everything is ready
 	@$(DOCKER_COMP) up --wait
 
 start: build up ## Build and start the containers
