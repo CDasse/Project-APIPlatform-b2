@@ -21,7 +21,11 @@ use Symfony\Component\Uid\Uuid;
             provider: CityCollectionProvider::class,
             parameters: [
                 'q' => new QueryParameter(
-                    schema: ['type' => 'string'],
+                    schema: [
+                        'type' => 'string',
+                        'minLength' => 1,
+                        'maxLength' => 255,
+                    ],
                     description: 'Filtre textuel sur le nom de la ville. Insensible à la casse et aux accents.',
                 ),
                 'limit' => new QueryParameter(
