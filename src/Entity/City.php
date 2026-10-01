@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
@@ -16,6 +17,7 @@ use Symfony\Component\Uid\Uuid;
     operations: [
         new GetCollection(
             uriTemplate: '/cities',
+            openapi: new OpenApiOperation(security: []),
             paginationEnabled: false,
             output: CityListOutput::class,
             provider: CityCollectionProvider::class,
