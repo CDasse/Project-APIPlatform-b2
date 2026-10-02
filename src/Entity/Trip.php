@@ -2,15 +2,55 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
+use ApiPlatform\OpenApi\Model\Response as OpenApiResponse;
+use App\Dto\Trip\TripDetailsOutput;
+use App\Dto\Trip\TripListOutput;
+use App\Dto\Trip\TripSearchInput;
 use App\Entity\Enum\CatapultModel;
 use App\Entity\Impl\AbstractEntity;
 use App\Repository\TripRepository;
+use App\State\Trip\TripItemProvider;
+use App\State\Trip\TripSearchProcessor;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
+#[ApiResource(operations: [
+    new Get(
+        uriTemplate: '/trips/{id}',
+        output: TripDetailsOutput::class,
+        provider: TripItemProvider::class,
+        openapi: new OpenApiOperation(
+            security: []
+        )
+    ),
+    new Post(
+        uriTemplate: '/trips/search',
+        // un Post répond 201 par défaut : cette recherche ne crée rien, le contrat n'y déclare qu'un 200
+        status: 200,
+        openapi: new OpenApiOperation(
+            security: [],
+            responses: ['200' => new OpenApiResponse(
+                description: 'Les lancers disponibles',
+                content: new \ArrayObject([
+                    'application/json' => [
+                        'schema' => [
+                            'type' => 'array',
+                            'items' => ['$ref' => '#/components/schemas/Trip.TripListOutput'],
+                ]]]),
+            )]
+        ),
+        input: TripSearchInput::class,
+        output: TripListOutput::class,
+        processor: TripSearchProcessor::class,
+    ),
+])]
 #[ORM\Entity(repositoryClass: TripRepository::class)]
 class Trip extends AbstractEntity
 {

@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Exception\User;
+namespace App\Exception\City;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-final class EmailAlreadyUsedException extends HttpException
+class CityNotFoundException extends HttpException
 {
     public function __construct()
     {
         parent::__construct(
-            Response::HTTP_CONFLICT,
-            'Email is already used by another user.'
+            Response::HTTP_NOT_FOUND,
+            'No city carries this identifier.'
         );
     }
 }

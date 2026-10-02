@@ -2,7 +2,9 @@
 
 namespace App\Repository;
 
+use App\Entity\City;
 use App\Entity\Trip;
+use DateMalformedStringException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,28 +18,26 @@ class TripRepository extends ServiceEntityRepository
         parent::__construct($registry, Trip::class);
     }
 
-//    /**
-//     * @return Trip[] Returns an array of Trip objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('t')
-//            ->andWhere('t.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('t.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    /** @return Trip[]
+     * @throws DateMalformedStringException
+     */
+    public function search(City $origin, City $destination, \DateTimeImmutable $day): array
+    {
+        $dayStart = $day->setTime(0,0);
+        $dayEnd = $dayStart->modify('+1 day');
 
-//    public function findOneBySomeField($value): ?Trip
-//    {
-//        return $this->createQueryBuilder('t')
-//            ->andWhere('t.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        return $this->createQueryBuilder('trip')
+            ->andWhere('trip.deletedAt is NULL')
+            ->andWhere('trip.origin = :origin')
+            ->andWhere('trip.destination = :destination')
+            ->andWhere('trip.departureAt >= :dayStart')
+            ->andWhere('trip.departureAt < :dayEnd')
+            ->orderBy('trip.departureAt', 'ASC')
+            ->setParameter('origin', $origin)
+            ->setParameter('destination', $destination)
+            ->setParameter('dayStart', $dayStart)
+            ->setParameter('dayEnd', $dayEnd)
+            ->getQuery()
+            ->getResult();
+    }
 }

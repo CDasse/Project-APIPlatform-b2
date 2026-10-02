@@ -8,6 +8,9 @@ enum CatapultModel: string
     case BalisteXR = 'Baliste XR';
     case Mangonneau700 = 'Mangonneau 700';
 
+    /**
+     * @return int maxBaggageWeight in kg
+     */
     public function maxBaggageWeightKg(): int
     {
         return match ($this) {
