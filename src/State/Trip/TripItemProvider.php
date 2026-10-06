@@ -5,7 +5,6 @@ namespace App\State\Trip;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Dto\Trip\TripDetailsOutput;
-use App\Dto\User\UserDetailsOutput;
 use App\Service\TripService;
 
 

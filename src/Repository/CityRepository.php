@@ -22,7 +22,6 @@ class CityRepository extends ServiceEntityRepository
     public function search(?string $query = null, int $limit = 20): array
     {
         $qb = $this->createQueryBuilder('c')
-            ->andWhere('c.deletedAt IS NULL')
             ->orderBy('c.name', 'ASC')
             ->setMaxResults($limit);
 

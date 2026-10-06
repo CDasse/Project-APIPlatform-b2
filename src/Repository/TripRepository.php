@@ -27,7 +27,6 @@ class TripRepository extends ServiceEntityRepository
         $dayEnd = $dayStart->modify('+1 day');
 
         return $this->createQueryBuilder('trip')
-            ->andWhere('trip.deletedAt is NULL')
             ->andWhere('trip.origin = :origin')
             ->andWhere('trip.destination = :destination')
             ->andWhere('trip.departureAt >= :dayStart')

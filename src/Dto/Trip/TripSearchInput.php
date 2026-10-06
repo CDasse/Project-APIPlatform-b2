@@ -10,7 +10,8 @@ final class TripSearchInput
     public function __construct(
         #[Assert\NotBlank]
         #[Assert\Uuid]
-        #[ApiProperty(required: true,
+        #[ApiProperty(
+            required: true,
             schema: [
                 'type' => 'string',
                 'format' => 'uuid',
@@ -19,7 +20,8 @@ final class TripSearchInput
         )]
         public string $origin,
 
-        #[ApiProperty(required: true,
+        #[ApiProperty(
+            required: true,
             schema: [
                 'type' => 'string',
                 'format' => 'uuid',
@@ -30,7 +32,10 @@ final class TripSearchInput
         #[Assert\Uuid]
         public string $destination,
 
-        #[ApiProperty(required: true,
+        #[Assert\NotBlank]
+        #[Assert\Date]
+        #[ApiProperty(
+            required: true,
             schema: [
                 'type' => 'string',
                 'format' => 'date',
@@ -38,19 +43,18 @@ final class TripSearchInput
                 'description' => "Date du trajet."
             ]
         )]
-        #[Assert\NotBlank]
-        #[Assert\Date]
         public string $date,
 
-        #[ApiProperty(required: true,
+        #[Assert\NotBlank]
+        #[Assert\Positive]
+        #[ApiProperty(
+            required: true,
             schema: [
                 'type' => 'integer',
                 'minimum' => 1,
                 'description' => "Nombre de passagers."
             ]
         )]
-        #[Assert\NotBlank]
-        #[Assert\Positive]
         public int $passengers,
     )
     {
