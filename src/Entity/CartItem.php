@@ -23,6 +23,9 @@ class CartItem extends AbstractEntity
     #[ORM\JoinColumn(nullable: false)]
     private Trip $trip;
 
+    /**
+     * @var int $passengers Number of passengers.
+     */
     #[ORM\Column]
     private int $passengers;
 

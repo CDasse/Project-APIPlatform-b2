@@ -9,12 +9,15 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use App\Dto\Cart\CartAddLineInput;
 use App\Dto\Cart\CartDetailsOutput;
+use App\Dto\Cart\CartPayInput;
+use App\Dto\Cart\CartPayOutput;
 use App\Entity\Enum\CartStatus;
 use App\Entity\Impl\AbstractEntity;
 use App\Repository\CartRepository;
 use App\State\Cart\CartAddLineProcessor;
 use App\State\Cart\CartCollectionProvider;
 use App\State\Cart\CartOpenProcessor;
+use App\State\Cart\CartPayProcessor;
 use App\State\Cart\CartProvider;
 use App\State\Cart\CartRemoveLineProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -56,6 +59,18 @@ use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
         security: "object.getCreatedBy() == user",
         openapi: new OpenApiOperation(
             summary: 'Adds a line to the cart.'
+        )
+    ),
+    new Post(
+        uriTemplate: '/carts/{id}/pay',
+        input: CartPayInput::class,
+        output: CartPayOutput::class,
+        provider: CartProvider::class,
+        processor: CartPayProcessor::class,
+        security: "object.getCreatedBy() == user",
+        status: 200,
+        openapi: new OpenApiOperation(
+            summary: 'Pay a cart.'
         )
     ),
     new Delete(
