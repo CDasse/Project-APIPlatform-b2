@@ -3,7 +3,9 @@
 namespace App\Service;
 
 use App\Dto\User\UserDetailsOutput;
+use App\Dto\User\UserProfilePictureInput;
 use App\Dto\User\UserRegisterInput;
+use App\Entity\Enum\DocumentType;
 use App\Entity\User;
 use App\Exception\User\EmailAlreadyUsedException;
 use App\Repository\UserRepository;
@@ -15,6 +17,7 @@ class UserService
 {
     public function __construct(
         private readonly UserRepository $userRepository,
+        private readonly DocumentService $documentService,
         private readonly UserPasswordHasherInterface $hasher,
         private readonly AuditService $auditService,
         private readonly LoggerInterface $domainLogger
@@ -55,12 +58,38 @@ class UserService
 
     public function toDetails(User $user): UserDetailsOutput
     {
+        $picture = $user->getProfilePicture();
+
         return new UserDetailsOutput(
             id: $user->getId(),
             email: $user->getEmail(),
             createdAt: $user->getCreatedAt(),
             firstName: $user->getFirstName(),
-            lastName: $user->getLastName()
+            lastName: $user->getLastName(),
+            profilePictureUrl: null === $picture
+                ? null
+                : $this->documentService->toSignedUrl($picture)
         );
+    }
+
+    /**
+     * Stores a new profile picture for this user and soft-deletes the previous one,
+     * in a single write.
+     */
+    public function changeProfilePicture(User $user, UserProfilePictureInput $input): void
+    {
+        $document = $this->documentService->store($input->file, DocumentType::ProfilePicture);
+
+        $previous = $user->getProfilePicture();
+
+        if ($previous !== null) {
+            $this->documentService->softDelete($previous);
+        }
+
+        $user->setProfilePicture($document);
+        $this->auditService->stampUpdate($user);
+
+        $this->userRepository->persist($user);
+        $this->userRepository->flush();
     }
 }

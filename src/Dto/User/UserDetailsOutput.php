@@ -44,6 +44,14 @@ class UserDetailsOutput
             'nullable' => true
         ])]
         public ?string $lastName = null,
+
+        #[ApiProperty(schema: [
+            'type' => 'string',
+            'format' => 'uri',
+            'description' => "Url de récupération de la photo de profil.",
+            'nullable' => true
+        ])]
+        public ?string $profilePictureUrl = null
     )
     {
     }

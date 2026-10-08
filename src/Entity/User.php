@@ -6,13 +6,16 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
+use ApiPlatform\OpenApi\Model\RequestBody;
 use App\Dto\User\UserDetailsOutput;
 use App\Dto\User\UserRegisterInput;
 use App\Entity\Impl\AbstractEntity;
 use App\Repository\UserRepository;
 use App\State\User\UserMeProvider;
+use App\State\User\UserProfilePictureProcessor;
 use App\State\User\UserRegisterProcessor;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\ManyToOne;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Uuid;
@@ -32,7 +35,28 @@ use Symfony\Component\Uid\Uuid;
             input: UserRegisterInput::class,
             output: UserDetailsOutput::class,
             processor: UserRegisterProcessor::class,
-        )
+        ),
+        new Post(
+            uriTemplate: '/users/me/profile-picture',
+            deserialize: false,
+            inputFormats: ['multipart' => ['multipart/form-data']],
+            output: UserDetailsOutput::class,
+            processor: UserProfilePictureProcessor::class,
+            security: "is_granted('ROLE_USER')",
+            openapi: new OpenApiOperation(
+                requestBody: new RequestBody(
+                    description: 'La nouvelle photo de profil',
+                    content: new \ArrayObject([
+                        'multipart/form-data' => ['schema' => [
+                            'type' => 'object',
+                            'properties' => ['file' => ['type' => 'string', 'format' => 'binary']],
+                            'required' => ['file'],
+                        ]],
+                    ]),
+                    required: true,
+                ),
+            ),
+        ),
     ]
 )]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -64,6 +88,9 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $lastName = null;
+
+    #[ORM\ManyToOne]
+    private ?Document $profilePicture = null;
 
     public function __construct()
     {
@@ -164,6 +191,18 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     public function setLastName(?string $lastName): static
     {
         $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function getProfilePicture(): ?Document
+    {
+        return $this->profilePicture;
+    }
+
+    public function setProfilePicture(?Document $profilePicture): static
+    {
+        $this->profilePicture = $profilePicture;
 
         return $this;
     }
